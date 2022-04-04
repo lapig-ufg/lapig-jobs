@@ -1,6 +1,5 @@
 FROM registry.lapig.iesa.ufg.br/lapig-images-prod/app_lapig_jobs:base
 
-
 # Clone app and npm install on server
 ENV URL_TO_APPLICATION_GITHUB="https://github.com/lapig-ufg/lapig-jobs.git"
 ENV BRANCH="main"
