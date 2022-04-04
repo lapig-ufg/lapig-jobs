@@ -79,10 +79,11 @@ app.database.client.init(function () {
                 .then('jobs')
                 .into(app);
 
+            const analysisAtlas = app.jobs.analysisAtlas;
 
             const httpServer = http.listen(app.config.port, function () {
                 console.log('LAPIG-JOBS Server @ [port %s] [pid %s]', app.config.port, process.pid.toString());
-                app.jobs.analysisAtlas.start();
+                analysisAtlas.start();
             });
 
             [`exit`, `uncaughtException`].forEach((event) => {
