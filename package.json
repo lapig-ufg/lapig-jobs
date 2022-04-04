@@ -4,6 +4,7 @@
     "description": "OWS and API Server for LAPIG",
     "main": "app.js",
     "dependencies": {
+        "adm-zip": "^0.5.9",
         "app-root-path": "^3.0.0",
         "archiver": "^5.3.0",
         "async": "^3.2.2",
@@ -53,6 +54,7 @@
         "request": "^2.88.0",
         "request-param": "^1.0.1",
         "response-time": "^2.3.2",
+        "session-memory-store": "^1.0.0",
         "tiles-in-bbox": "^1.0.2",
         "underscore": ">=1.13.1",
         "unidecode": "^0.1.8",
