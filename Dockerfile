@@ -7,7 +7,7 @@ ENV BRANCH="main"
 LABEL maintainer="Renato Gomes <renatogomessilverio@gmail.com>"
 
 RUN cd /APP && git clone -b ${BRANCH} ${URL_TO_APPLICATION_GITHUB} && \
-    cd /APP/lapig-jobs/src/server && npm install
+    cd /APP/lapig-jobs && npm install
     
 CMD [ "/bin/bash", "-c", "/APP/src/server/prod-start.sh; tail -f /dev/null"]
 
