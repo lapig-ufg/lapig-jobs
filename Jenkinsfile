@@ -1,8 +1,7 @@
 node {
 
     load "$JENKINS_HOME/.envvars"
-    def exists=fileExists "src/server/package-lock.json"
-    def exists2=fileExists "src/client/package-lock.json"
+    def exists=fileExists "package-lock.json"
     def application_name= "app_lapig_jobs"
 
         stage('Checkout') {
@@ -36,57 +35,15 @@ node {
                         sh "npm set progress=false"
                         if (exists) {
                             echo 'Yes'
-                            sh "cd src/server && npm ci" 
+                            sh "npm ci" 
                         } else {
                             echo 'No'
-                            sh "cd src/server && npm install" 
+                            sh "npm install" 
                         }
-                        if (exists2) {
-                            echo 'Yes'
-                            sh "cd src/client && npm ci"
-                        } else {
-                            echo 'No'
-                            sh "cd src/client && npm install" 
-                        }
-
-                        //VERIFY IF BUILD IS COMPLETE AND NOTIFY IN DISCORD ABOUT OF THE RESULT
-                        sh "export NODE_OPTIONS=--max-old-space-size=8096"
-                        def status = sh(returnStatus: true, script: "cd src/client && ng build --stats-json --source-map=false --no-progress")
-                        if (status != 0) {
-                            echo "FAILED BUILD!"
-                            currentBuild.result = 'FAILED'
-                            def discordImageSuccess = 'https://www.jenkins.io/images/logos/formal/256.png'
-                            def discordImageError = 'https://www.jenkins.io/images/logos/fire/256.png'
-
-                            def discordDesc =
-                                    "Result: ${currentBuild.currentResult}\n" +
-                                            "Project: Nome projeto\n" +
-                                            "Commit: Quem fez commit\n" +
-                                            "Author: Autor do commit\n" +
-                                            "Message: EROO NA BUILD!\n" +
-                                            "Duration: ${currentBuild.durationString}"
-
-                                            //Variaveis de ambiente do Jenkins - NOME DO JOB E NÚMERO DO JOB
-                                            def discordFooter = "${env.JOB_BASE_NAME} (#${BUILD_NUMBER})"
-                                            def discordTitle = "${env.JOB_BASE_NAME} (build #${BUILD_NUMBER})"
-                                            def urlWebhook = "https://discord.com/api/webhooks/$DiscordKey"
-
-                            discordSend description: discordDesc,
-                                    footer: discordFooter,
-                                    link: env.JOB_URL,
-                                    result: currentBuild.currentResult,
-                                    title: discordTitle,
-                                    webhookURL: urlWebhook,
-                                    successful: currentBuild.resultIsBetterOrEqualTo('SUCCESS'),
-                                    thumbnail: 'SUCCESS'.equals(currentBuild.currentResult) ? discordImageSuccess : discordImageError
-                            autoCancelled = true
-                            error('Aborting the build.')
-    }                               
-
-                }
+        }
         }
         stage('Building Image') {
-            dockerImage = docker.build registryprod+ "/$application_name:$BUILD_NUMBER", "--build-arg  --no-cache -f Dockerfile ."
+            dockerImage = docker.build registryprod + "/$application_name:$BUILD_NUMBER", "--build-arg  --no-cache -f Dockerfile ."
         }
         stage('Push Image to Registry') {
 
