@@ -10,8 +10,6 @@ LABEL maintainer="Renato Gomes <renatogomessilverio@gmail.com>"
 RUN cd /APP && git clone -b ${BRANCH} ${URL_TO_APPLICATION_GITHUB} && \
     cd /APP/lapig-jobs/src/server && npm install
     
-ADD ./src/client/dist/client /APP/lapig-jobs/src/client/dist/client
-
 CMD [ "/bin/bash", "-c", "/APP/src/server/prod-start.sh; tail -f /dev/null"]
 
 ENTRYPOINT [ "/APP/Monitora.sh"]
