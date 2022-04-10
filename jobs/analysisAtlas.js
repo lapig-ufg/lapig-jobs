@@ -82,7 +82,7 @@ module.exports = function (app) {
                         if(jobsRuning < 1){
                             self.run()
                         } else {
-                            console.log('Has job runing', jobsRuning)
+                            console.log('Has job runing or queue empty', jobsRuning)
                         }
                     })
                 }, 30000);
