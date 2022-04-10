@@ -32,11 +32,16 @@ module.exports = function (app) {
                             const pasture = await axios.all(promisesPasture);
                             const pastureQuality = await axios.all(promisesPastureQuality);
 
+                            console.log('areaInfo', areaInfo.data, 'pasture', pasture.data, 'pastureQuality', pastureQuality.data )
+
+                            const finalPasture = pasture.data.filter(past => past.area_pastagem != null)
+                            const finalpastureQuality = pasture.data.filter(pstQuality => pstQuality.area_pastagem != null)
+
                             const analysis = {
-                                "regions_intersected": areaInfo.regions_intersected,
-                                "shape_upload": areaInfo.shape_upload,
-                                "pasture": pasture,
-                                "pasture_quality": pastureQuality
+                                "regions_intersected": areaInfo.data.regions_intersected,
+                                "shape_upload": areaInfo.data.shape_upload,
+                                "pasture": finalPasture,
+                                "pasture_quality": finalpastureQuality
                             }
 
                             console.log('analysis', analysis)
@@ -60,27 +65,6 @@ module.exports = function (app) {
                                 )
                             });
 
-                                //         .then(axios.spread((...responses) => {
-                                //             return responses.map(array => array.data[0]);
-                                //         })).then(pastureQuality => {
-                                //             console.log(pasture, pastureQuality)
-                                //             areaInfo.then(resp => {
-                                //                 const info = resp.data;
-                                //
-                                //
-                                //             })
-                                //         }).catch( e => {
-                                //             collectionsJobs.jobs.updateOne(
-                                //                 {"_id":job._id},
-                                //                 {$set: {"status": 'FAILED', "endRunning": new Date(), "failedGetPastureQualityData": e }}
-                                //             )
-                                //         });
-                                // }).catch( e => {
-                                //     collectionsJobs.jobs.updateOne(
-                                //         {"_id":job._id},
-                                //         {$set: {"status": 'FAILED', "endRunning": new Date(), "failedGetPastureData": e}}
-                                //     )
-                                // });
                         });
 
                     });

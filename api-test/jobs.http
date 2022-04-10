@@ -1,3 +1,23 @@
+GET http://localhost:3000/service/upload/getanalysis?token=1649536427164&origin=ATLAS&lang=pt
+Accept: application/json
+
+###
+GET http://localhost:3000/service/upload/pastureforjob?year=2019&token=1649536427164
+Accept: application/json
+
+###
+GET http://localhost:3000/service/upload/pasturequalityforjob?year=2019&token=1649536427164
+Accept: application/json
+
+###
+GET https://atlasdaspastagens.ufg.br/service/upload/pasturequalityforjob?year=1985&token=1649030539966
+Accept: application/json
+
+###
+GET https://atlasdaspastagens.ufg.br/service/upload/pastureforjob?year=1985&token=1649030539966
+Accept: application/json
+
+###
 #Create JOB Request
 GET http://localhost:3000/api/job/create
 
