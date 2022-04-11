@@ -24,6 +24,8 @@ module.exports = function (app) {
                 } else {
                     const mainOptions = {
                         from: title + ' <' + config.mailer.from + '>',
+                        sender: config.mailer.sender,
+                        replyTo: config.mailer.sender,
                         to: job.email,
                         subject: text.subject,
                         html: data
@@ -61,6 +63,8 @@ module.exports = function (app) {
                 } else {
                     const mainOptions = {
                         from: title + ' <' + config.mailer.from + '>',
+                        sender: config.mailer.sender,
+                        replyTo: config.mailer.sender,
                         to: job.email,
                         subject: text.subject,
                         html: data

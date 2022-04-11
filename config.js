@@ -45,6 +45,7 @@ module.exports = function (app) {
         "port": env.PORT,
         "mailer": {
             "from": env.MAILER_FROM,
+            "sender": env.MAILER_SENDER,
             "host": env.MAILER_HOST,
             "port": env.MAILER_PORT,
             "user": env.MAILER_USER,

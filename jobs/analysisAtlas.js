@@ -10,7 +10,6 @@ module.exports = function (app) {
         collectionsJobs.jobs.find({ status: 'PENDING', application: 'ATLAS' }).limit(1).toArray().then(  (jobs) => {
             if (Array.isArray(jobs)) {
                 jobs.forEach(job => {
-                    mailerController.response(job)
                     console.log('ANALYSIS JOB ATLAS START AT: ', new Date(), 'JOB: ', job.name)
                     // Get all years for analysis
                     axios.get('https://atlasdaspastagens.ufg.br/service/upload/getpastureyears').then( resp => {
@@ -20,6 +19,7 @@ module.exports = function (app) {
                             {$set: {"status": 'RUNNING', "startRunning": new Date()}}
                         ).then(() => {
                             //Send email notification
+                            mailerController.notification(job)
                         }).then(async () => {
                             let promisesPasture = [];
                             let promisesPastureQuality = [];
@@ -35,10 +35,8 @@ module.exports = function (app) {
                             const pasture = await axios.all(promisesPasture);
                             const pastureQuality = await axios.all(promisesPastureQuality);
 
-                            console.log('areaInfo', areaInfo.data, 'pasture', pasture.data, 'pastureQuality', pastureQuality.data )
-
                             const finalPasture = pasture.data.filter(past => past.area_pastagem != null)
-                            const finalpastureQuality = pasture.data.filter(pstQuality => pstQuality.area_pastagem != null)
+                            const finalpastureQuality = pastureQuality.data.filter(pstQuality => pstQuality.area_pastagem != null)
 
                             const analysis = {
                                 "regions_intersected": areaInfo.data.regions_intersected,
@@ -60,6 +58,7 @@ module.exports = function (app) {
                                     {$set: {"status": 'DONE', "endRunning": new Date()}}
                                 ).then(() => {
                                     // Send email response
+                                    mailerController.response(job)
                                 })
                             }).catch( e => {
                                 collectionsJobs.jobs.updateOne(
