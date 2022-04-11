@@ -116,7 +116,7 @@
         <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#f9f9f9;background-color:#f9f9f9;width:100%;">
             <tbody>
             <tr>
-                <td style="border-bottom:#333957 solid 5px;direction:ltr;font-size:0px;padding:20px 0;text-align:center;vertical-align:top;">
+                <td style="border-bottom:#4d4519 solid 5px;direction:ltr;font-size:0px;padding:20px 0;text-align:center;vertical-align:top;">
                     <!--[if mso | IE]>
                     <table role="presentation" border="0" cellpadding="0" cellspacing="0">
 
@@ -174,9 +174,7 @@
                                         <tbody>
                                         <tr>
                                             <td style="width:100%;">
-
-                                                <img height="auto" src="https://www.waltersilverio.adv.br/images/logo.png" style="border:0;display:block;outline:none;text-decoration:none;width:100%;" width="64" />
-
+                                                <img height="auto" src="https://atlasdaspastagens.ufg.br/assets/logos/atlas_logo.png" style="border:0;display:block;outline:none;text-decoration:none;width:10rem;" width="64" />
                                             </td>
                                         </tr>
                                         </tbody>
@@ -189,7 +187,7 @@
                                 <td align="center" style="font-size:0px;padding:10px 25px;padding-bottom:40px;word-break:break-word;">
 
                                     <div style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:28px;font-weight:bold;line-height:1;text-align:center;color:#555;">
-                                        Comentário de Artigo
+                                        <%= email.title %>
                                     </div>
 
                                 </td>
@@ -199,31 +197,30 @@
                                 <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
 
                                     <div style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:16px;line-height:22px;text-align:left;color:#555;">
-                                        Olá Dr.º Walter Silvério!<br><br>
-                                        Segue o comentário do artigo: <strong>{{$publication->title}}</strong>, realizado por <strong>{{$name}}</strong>, no dia <strong>{{date('d/m/Y H:i:s', strtotime($date))}}</strong>.
+                                        <%= email.hello %>.
+                                        <br><br>
+                                        <%= email.body %>
                                     </div>
 
                                 </td>
                             </tr>
-
                             <tr>
                                 <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+
                                     <div style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:16px;line-height:22px;text-align:left;color:#555;">
-                                        Email: <strong>{{$email}}</strong>
-                                    </div>
-                                    <br><br>
-                                    <div style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:16px;line-height:22px;text-align:left;color:#555;">
-                                        Comentário: <strong>{!! $comment !!}</strong>
+                                        <%= email.url %>
                                     </div>
 
                                 </td>
                             </tr>
-
                             <tr>
                                 <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
 
                                     <div style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:14px;line-height:20px;text-align:left;color:#525252;">
-                                        Atenciosamente,<br><br> Sistema Automático de Emails @ waltersilverio.adv.br<br>
+                                        <%= email.regards %>
+                                        <br>
+                                        <br>
+                                        <%= email.team %>
                                     </div>
 
                                 </td>

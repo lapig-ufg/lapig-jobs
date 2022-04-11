@@ -4,10 +4,13 @@ module.exports = function (app) {
     let self = {}
     let Jobs = {};
     const collectionsJobs = app.middleware.repository.collectionsJobs;
+    const mailerController = app.controllers.mailer;
+
     self.run = function () {
-        collectionsJobs.jobs.find({ status: 'PENDING' }).limit(1).toArray().then(  (jobs) => {
+        collectionsJobs.jobs.find({ status: 'PENDING', application: 'ATLAS' }).limit(1).toArray().then(  (jobs) => {
             if (Array.isArray(jobs)) {
                 jobs.forEach(job => {
+                    mailerController.response(job)
                     console.log('ANALYSIS JOB ATLAS START AT: ', new Date(), 'JOB: ', job.name)
                     // Get all years for analysis
                     axios.get('https://atlasdaspastagens.ufg.br/service/upload/getpastureyears').then( resp => {

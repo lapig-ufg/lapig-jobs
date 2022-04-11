@@ -19,6 +19,7 @@ const cookie = parseCookie('LAPIG-JOBS')
 
 load('config.js', {'verbose': false})
     .then('database')
+    .then('mailer')
     .then('middleware')
     .into(app);
 
@@ -47,55 +48,65 @@ app.all('*', cors(corsOptions));
 app.database.client.init(function () {
     app.middleware.repository.init(() => {
         app.database.client.init_general(() => {
-
-            app.use(cookie);
-            app.use(compression());
-
-            app.use(requestTimeout({
-                'timeout': 2000 * 60 * 30 * 24,
-                'callback': function (err, options) {
-                    let response = options.res;
-                    if (err) {
-                        util.log('Timeout: ' + err);
-                    }
-                    response.end();
-                }
-            }));
-
-            app.use(responseTime());
-            app.use(requestParam());
-            app.use(morgan('tiny'));
-
-            app.use(bodyParser.urlencoded({extended: true}));
-            app.use(bodyParser.json({limit: '1gb'}));
-
-            app.use(function (error, request, response, next) {
-                console.log('ServerError: ', error.stack);
-                next();
-            });
-
-            load('controllers')
-                .then('routes')
-                .then('jobs')
-                .into(app);
-
-            const analysisAtlas = app.jobs.analysisAtlas;
-
-            const httpServer = http.listen(app.config.port, function () {
-                console.log('LAPIG-JOBS Server @ [port %s] [pid %s]', app.config.port, process.pid.toString());
-                analysisAtlas.start();
-            });
-
-            [`exit`, `uncaughtException`].forEach((event) => {
-                if (event === 'uncaughtException') {
-                    process.on(event, (e) => {
-                    })
+            app.mailer.transporter.verify((error, success) => {
+                if (error) {
+                    console.error(error);
                 } else {
-                    process.on(event, (e) => {
-                        httpServer.close(() => process.exit())
+
+                    app.use(cookie);
+                    app.use(compression());
+
+                    app.use(requestTimeout({
+                        'timeout': 2000 * 60 * 30 * 24,
+                        'callback': function (err, options) {
+                            let response = options.res;
+                            if (err) {
+                                util.log('Timeout: ' + err);
+                            }
+                            response.end();
+                        }
+                    }));
+
+                    app.use(responseTime());
+                    app.use(requestParam());
+                    app.use(morgan('tiny'));
+
+                    app.use(bodyParser.urlencoded({extended: true}));
+                    app.use(bodyParser.json({limit: '1gb'}));
+
+                    app.use(function (error, request, response, next) {
+                        console.log('ServerError: ', error.stack);
+                        next();
+                    });
+
+                    load('controllers')
+                        .then('routes')
+                        .then('jobs')
+                        .into(app);
+
+                    const analysisAtlas = app.jobs.analysisAtlas;
+
+                    const httpServer = http.listen(app.config.port, function () {
+                        console.log('LAPIG-JOBS Server @ [port %s] [pid %s]', app.config.port, process.pid.toString());
+                        if(success){
+                            console.log('Mailer is ready to send messages');
+                        }
+                        analysisAtlas.start();
+                    });
+
+                    [`exit`, `uncaughtException`].forEach((event) => {
+                        if (event === 'uncaughtException') {
+                            process.on(event, (e) => {
+                            })
+                        } else {
+                            process.on(event, (e) => {
+                                httpServer.close(() => process.exit())
+                            })
+                        }
                     })
                 }
-            })
+            });
+
         });
     });
 })

@@ -5,13 +5,11 @@ module.exports = function (app) {
 
     const appProducao = env.APP_PRODUCAO;
 
-    var pathTmp = env.PATH_TMP
     let config = {
         "appRoot": appRoot,
         "clientDir": appRoot + env.CLIENT_DIR,
         "downloadDataDir": appRoot + env.DOWNLOAD_DATA_DIR,
         "cacheTilesDir": env.CACHE_TILES_DIR,
-
         "pg_lapig": {
             "user": env.PG_USER,
             "host": env.PG_HOST,
@@ -35,7 +33,7 @@ module.exports = function (app) {
             "connectionTimeoutMillis": 0,
         },
         "mongo": {
-            "host":env.MONGO_HOST,
+            "host": env.MONGO_HOST,
             "port": env.MONGO_PORT,
             "dbname": env.MONGO_DATABASE,
             "url": env.MONGO_URL,
@@ -45,12 +43,18 @@ module.exports = function (app) {
         },
         "jobsConfig": env.MONGO_JOBS_CONFIG,
         "port": env.PORT,
+        "mailer": {
+            "from": env.MAILER_FROM,
+            "host": env.MAILER_HOST,
+            "port": env.MAILER_PORT,
+            "user": env.MAILER_USER,
+            "password": env.MAILER_PASSWORD
+        },
         "ows_host": env.OWS_HOST,
         "ows_local": env.OWS_LOCAL,
     };
 
-    if (env.NODE_ENV === 'prod' || env.NODE_ENV === 'worker') {
-
+    if (env.NODE_ENV === 'prod') {
         config['port'] = env.PORT;
         config["downloadDataDir"] = appProducao + env.DOWNLOAD_DATA_DIR;
     }
