@@ -5,6 +5,8 @@ module.exports = function (app) {
     let Jobs = {};
     const collectionsJobs = app.middleware.repository.collectionsJobs;
     const mailerController = app.controllers.mailer;
+    const url= 'https://atlasdaspastagens.ufg.br';
+    // const url= 'http://localhost:3000'
 
     self.run = function () {
         collectionsJobs.jobs.find({ status: 'PENDING', application: 'ATLAS' }).limit(1).toArray().then(  (jobs) => {
@@ -12,7 +14,7 @@ module.exports = function (app) {
                 jobs.forEach(job => {
                     console.log('ANALYSIS JOB ATLAS START AT: ', new Date(), 'JOB: ', job.name)
                     // Get all years for analysis
-                    axios.get('https://atlasdaspastagens.ufg.br/service/upload/getpastureyears').then( resp => {
+                    axios.get(url + '/service/upload/getpastureyears').then( resp => {
                      const years = resp.data
                         collectionsJobs.jobs.updateOne(
                             {"_id":job._id},
@@ -25,18 +27,21 @@ module.exports = function (app) {
                             let promisesPastureQuality = [];
 
                             years.pasture.forEach(year => {
-                                promisesPasture.push(axios.get(`https://atlasdaspastagens.ufg.br/service/upload/pastureforjob?year=${year}&token=${job.token}`))
+                                promisesPasture.push(axios.get(`${url}/service/upload/pastureforjob?year=${year}&token=${job.token}`))
                             })
                             years.pasture_quality.forEach(year => {
-                                promisesPastureQuality.push(axios.get(`https://atlasdaspastagens.ufg.br/service/upload/pasturequalityforjob?year=${year}&token=${job.token}`))
+                                promisesPastureQuality.push(axios.get(`${url}/service/upload/pasturequalityforjob?year=${year}&token=${job.token}`))
                             })
 
-                            const areaInfo = await axios.get(`https://atlasdaspastagens.ufg.br/service/upload/areainfo?token=${job.token}`);
-                            const pasture = await axios.all(promisesPasture);
-                            const pastureQuality = await axios.all(promisesPastureQuality);
+                            const areaInfo = await axios.get(`${url}/service/upload/areainfo?token=${job.token}`);
+                            const pasture = await Promise.all(promisesPasture);
+                            const pastureQuality = await Promise.all(promisesPastureQuality);
 
-                            const finalPasture = pasture.data.filter(past => past.area_pastagem != null)
-                            const finalpastureQuality = pastureQuality.data.filter(pstQuality => pstQuality.area_pastagem != null)
+                            pasture.forEach(past => console.log(past.data))
+                            pastureQuality.forEach(pstQuality => console.log(pstQuality.data))
+
+                            const finalPasture = pasture.filter(past => past.data[0].area_pastagem != null)
+                            const finalpastureQuality = pastureQuality.filter(pstQuality => pstQuality.data[0].area_pastagem != null)
 
                             const analysis = {
                                 "regions_intersected": areaInfo.data.regions_intersected,
@@ -47,7 +52,7 @@ module.exports = function (app) {
 
                             console.log('analysis', analysis)
 
-                            axios.post('https://atlasdaspastagens.ufg.br/service/upload/saveanalysis', {
+                            axios.post(`${url}/service/upload/saveanalysis`, {
                                     token: job.token,
                                     analysis: analysis,
                                     origin: job.application
