@@ -37,11 +37,8 @@ module.exports = function (app) {
                             const pasture = await Promise.all(promisesPasture);
                             const pastureQuality = await Promise.all(promisesPastureQuality);
 
-                            pasture.forEach(past => console.log(past.data))
-                            pastureQuality.forEach(pstQuality => console.log(pstQuality.data))
-
-                            const finalPasture = pasture.filter(past => past.data[0].area_pastagem != null)
-                            const finalpastureQuality = pastureQuality.filter(pstQuality => pstQuality.data[0].area_pastagem != null)
+                            const finalPasture = pasture.map(past => past.data[0])
+                            const finalpastureQuality = pastureQuality.map(pstQuality => pstQuality.data)
 
                             const analysis = {
                                 "regions_intersected": areaInfo.data.regions_intersected,
