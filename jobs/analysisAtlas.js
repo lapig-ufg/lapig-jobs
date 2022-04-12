@@ -47,8 +47,6 @@ module.exports = function (app) {
                                 "pasture_quality": finalpastureQuality
                             }
 
-                            console.log('analysis', analysis)
-
                             axios.post(`${url}/service/upload/saveanalysis`, {
                                     token: job.token,
                                     analysis: analysis,
@@ -86,7 +84,7 @@ module.exports = function (app) {
                         if(jobsRuning < 1){
                             self.run()
                         } else {
-                            console.log('Has job runing or queue empty', jobsRuning)
+                            console.log('Has job runing or queue empty')
                         }
                     })
                 }, 30000);
