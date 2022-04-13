@@ -91,7 +91,7 @@ app.database.client.init(function () {
                         if(success){
                             console.log('Mailer is ready to send messages');
                         }
-                        analysisAtlas.start();
+                        // analysisAtlas.start();
                     });
 
                     [`exit`, `uncaughtException`].forEach((event) => {
