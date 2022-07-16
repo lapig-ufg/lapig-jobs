@@ -7,7 +7,6 @@ module.exports = function (app) {
     const mailerController = app.controllers.mailer;
     const url= 'https://atlasdaspastagens.ufg.br';
     // const url= 'http://localhost:3000'
-
     self.run = function () {
         collectionsJobs.jobs.find({ status: 'PENDING', application: 'ATLAS' }).limit(1).toArray().then(  (jobs) => {
             if (Array.isArray(jobs)) {
@@ -27,48 +26,63 @@ module.exports = function (app) {
                             let promisesPastureQuality = [];
 
                             years.pasture.forEach(year => {
+                                
                                 promisesPasture.push(axios.get(`${url}/service/upload/pastureforjob?year=${year}&token=${job.token}`))
                             })
                             years.pasture_quality.forEach(year => {
+                                
                                 promisesPastureQuality.push(axios.get(`${url}/service/upload/pasturequalityforjob?year=${year}&token=${job.token}`))
                             })
 
-                            const areaInfo = await axios.get(`${url}/service/upload/areainfo?token=${job.token}`);
-                            const pasture = await Promise.all(promisesPasture);
-                            const pastureQuality = await Promise.all(promisesPastureQuality);
+                            try{
+                                const areaInfo = await axios.get(`${url}/service/upload/areainfo?token=${job.token}`)
+                                app.utils.logger.info(`Service uploaded ${areaInfo.data}`);
+                                const pasture = await Promise.all(promisesPasture);
+                                const pastureQuality = await Promise.all(promisesPastureQuality);
 
-                            const finalPasture = pasture.map(past => past.data[0])
-                            const finalpastureQuality = pastureQuality.map(pstQuality => pstQuality.data)
+                                const finalPasture = pasture.map(past => past.data[0])
+                                const finalpastureQuality = pastureQuality.map(pstQuality => pstQuality.data)
 
-                            const analysis = {
-                                "regions_intersected": areaInfo.data.regions_intersected,
-                                "shape_upload": areaInfo.data.shape_upload,
-                                "pasture": finalPasture,
-                                "pasture_quality": finalpastureQuality
-                            }
-
-                            axios.post(`${url}/service/upload/saveanalysis`, {
-                                    token: job.token,
-                                    analysis: analysis,
-                                    origin: job.application
+                                const analysis = {
+                                    "regions_intersected": areaInfo.data.regions_intersected,
+                                    "shape_upload": areaInfo.data.shape_upload,
+                                    "pasture": finalPasture,
+                                    "pasture_quality": finalpastureQuality
                                 }
-                            ).then(result => {
-                                collectionsJobs.jobs.updateOne(
-                                    {"_id":job._id},
-                                    {$set: {"status": 'DONE', "endRunning": new Date()}}
-                                ).then(() => {
-                                    // Send email response
-                                    mailerController.response(job)
-                                })
-                            }).catch( e => {
-                                collectionsJobs.jobs.updateOne(
-                                    {"_id":job._id},
-                                    {$set: {"status": 'FAILED', "endRunning": new Date(), "failedMsgSaveAnalysis": e}}
-                                )
-                            });
 
+                                axios.post(`${url}/service/upload/saveanalysis`, {
+                                        token: job.token,
+                                        analysis: analysis,
+                                        origin: job.application
+                                    }
+                                ).then(result => {
+                                    collectionsJobs.jobs.updateOne(
+                                        {"_id":job._id},
+                                        {$set: {"status": 'DONE', "endRunning": new Date()}}
+                                    ).then(() => {
+                                        // Send email response
+                                        mailerController.response(job)
+                                    })
+                                }).catch( e => {
+                                    collectionsJobs.jobs.updateOne(
+                                        {"_id":job._id},
+                                        {$set: {"status": 'FAILED', "endRunning": new Date(), "failedMsgSaveAnalysis": e}}
+                                    )
+                                });
+
+
+                            }catch(err){
+                                app.utils.logger.error(`Service upload error areainfo {_id:${job._id}}:`, error= err);
+                                collectionsJobs.jobs.updateOne(
+                                    {"_id":job._id},
+                                    {$set: {"status": 'FAILED', "endRunning": new Date(), "failedMsgSaveAnalysis": err.toString()}}
+                                )
+                            }    
+                            
                         });
 
+                    }).catch( e => {
+                        console.log('Service error: ' + e.message);
                     });
                 })
             }
