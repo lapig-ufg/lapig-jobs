@@ -58,6 +58,7 @@
         "tiles-in-bbox": "^1.0.2",
         "underscore": ">=1.13.1",
         "unidecode": "^0.1.8",
+        "winston": "^3.8.1",
         "xml2js": "^0.4.23",
         "zlib": "^1.0.5"
     },

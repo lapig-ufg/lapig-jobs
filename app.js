@@ -18,6 +18,7 @@ const http = require('http').Server(app);
 const cookie = parseCookie('LAPIG-JOBS')
 
 load('config.js', {'verbose': false})
+    .then('utils')
     .then('database')
     .then('mailer')
     .then('middleware')
@@ -29,7 +30,8 @@ const allowedOrigins = [
     'https://covidgoias.ufg.br',
     'https://maps.lapig.iesa.ufg.br',
     'https://cepf.lapig.iesa.ufg.br',
-    'https://araticum.lapig.iesa.ufg.br'
+    'https://araticum.lapig.iesa.ufg.br',
+    'http://localhost:3000'
 ];
 
 const corsOptions = {
@@ -89,8 +91,9 @@ app.database.client.init(function () {
                     const httpServer = http.listen(app.config.port, function () {
                         console.log('LAPIG-JOBS Server @ [port %s] [pid %s]', app.config.port, process.pid.toString());
                         if(success){
-                            console.log('Mailer is ready to send messages');
+                            app.utils.logger.info('Mailer is ready to send messages');
                         }
+
                         analysisAtlas.start();
                     });
 
