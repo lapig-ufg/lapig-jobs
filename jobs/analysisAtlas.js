@@ -36,46 +36,63 @@ module.exports = function (app) {
 
                             try{
                                 const areaInfo = await axios.get(`${url}/service/upload/areainfo?token=${job.token}`)
+
                                 app.utils.logger.info(`Service uploaded ${areaInfo.data}`);
-                                const pasture = await Promise.all(promisesPasture);
-                                const pastureQuality = await Promise.all(promisesPastureQuality);
 
-                                const finalPasture = pasture.map(past => past.data[0])
-                                const finalpastureQuality = pastureQuality.map(pstQuality => pstQuality.data)
+                                Promise.all(promisesPasture).then(pasture => {
 
-                                const analysis = {
-                                    "regions_intersected": areaInfo.data.regions_intersected,
-                                    "shape_upload": areaInfo.data.shape_upload,
-                                    "pasture": finalPasture,
-                                    "pasture_quality": finalpastureQuality
-                                }
+                                    Promise.all(promisesPastureQuality).then(pastureQuality => {
+                                        const finalPasture = pasture.map(past => past.data[0])
+                                        const finalpastureQuality = pastureQuality.map(pstQuality => pstQuality.data)
 
-                                axios.post(`${url}/service/upload/saveanalysis`, {
-                                        token: job.token,
-                                        analysis: analysis,
-                                        origin: job.application
-                                    }
-                                ).then(result => {
-                                    collectionsJobs.jobs.updateOne(
-                                        {"_id":job._id},
-                                        {$set: {"status": 'DONE', "endRunning": new Date()}}
-                                    ).then(() => {
-                                        // Send email response
-                                        mailerController.response(job)
+                                        const analysis = {
+                                            "regions_intersected": areaInfo.data.regions_intersected,
+                                            "shape_upload": areaInfo.data.shape_upload,
+                                            "pasture": finalPasture,
+                                            "pasture_quality": finalpastureQuality
+                                        }
+
+                                        axios.post(`${url}/service/upload/saveanalysis`, {
+                                                token: job.token,
+                                                analysis: analysis,
+                                                origin: job.application
+                                            }
+                                        ).then(result => {
+                                            collectionsJobs.jobs.updateOne(
+                                                {"_id":job._id},
+                                                {$set: {"status": 'DONE', "endRunning": new Date()}}
+                                            ).then(() => {
+                                                // Send email response
+                                                mailerController.response(job)
+                                            })
+                                        }).catch( e => {
+                                            collectionsJobs.jobs.updateOne(
+                                                {"_id":job._id},
+                                                {$set: {"status": 'FAILED', "endRunning": new Date(), "failedMsgSaveAnalysis": e}}
+                                            )
+                                        });
+
+                                    }).catch(err => {
+                                        collectionsJobs.jobs.updateOne(
+                                            {"_id":job._id},
+                                            {$set: {"status": 'FAILED', "endRunning": new Date(), "failedMsgSaveAnalysis": `Error in promisesPastureQuality: ${err.message}`}}
+                                        )
+                                        app.utils.logger.error(`Error in promisesPastureQuality {_id:${job._id}}:`, error= err);
                                     })
-                                }).catch( e => {
+
+                                }).catch(err => {
                                     collectionsJobs.jobs.updateOne(
                                         {"_id":job._id},
-                                        {$set: {"status": 'FAILED', "endRunning": new Date(), "failedMsgSaveAnalysis": e}}
+                                        {$set: {"status": 'FAILED', "endRunning": new Date(), "failedMsgSaveAnalysis": `Error in  promisesPasture: ${err.message}`}}
                                     )
-                                });
-
-
+                                    app.utils.logger.error(`Error in  promisesPasture {_id:${job._id}}:`, error= err);
+                                })
+                                
                             }catch(err){
                                 app.utils.logger.error(`Service upload error areainfo {_id:${job._id}}:`, error= err);
                                 collectionsJobs.jobs.updateOne(
                                     {"_id":job._id},
-                                    {$set: {"status": 'FAILED', "endRunning": new Date(), "failedMsgSaveAnalysis": err.toString()}}
+                                    {$set: {"status": 'FAILED', "endRunning": new Date(), "failedMsgSaveAnalysis": `Error in  areainfo: ${err.message}`}}
                                 )
                             }    
                             
