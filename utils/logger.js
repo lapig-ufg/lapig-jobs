@@ -21,9 +21,9 @@ module.exports = function (app) {
                 winston.format.printf(({ level, message, timestamp, stack }) => {
                     if (stack) {
                         // print log trace 
-                        return `[ ${timestamp} ${level}]: ${message} \n ${stack}`;
+                        return `[${timestamp} ${level}]: ${message} \n ${stack}`;
                     }
-                    return `[ ${timestamp} ${level}]: ${message}`;
+                    return `[${timestamp} ${level}]: ${message}`;
                 })
             ),
             level: 'debug' 

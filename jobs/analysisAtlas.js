@@ -111,7 +111,6 @@ module.exports = function (app) {
             if(collectionsJobs.jobs){
                 app.utils.logger.debug('Init ' )
                 setInterval(() => {
-        
                     collectionsJobs.jobs.find( { status: 'RUNNING' }).count().then( jobsRuning => {
                         if(jobsRuning < 1 ){
                             app.utils.logger.debug('Queue is empty')
