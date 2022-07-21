@@ -109,19 +109,23 @@ module.exports = function (app) {
     Jobs.start = function () {
         try {
             if(collectionsJobs.jobs){
-                console.log('Init')
+                app.utils.logger.debug('Init ' )
                 setInterval(() => {
+        
                     collectionsJobs.jobs.find( { status: 'RUNNING' }).count().then( jobsRuning => {
-                        if(jobsRuning < 1){
+                        if(jobsRuning < 1 ){
+                            app.utils.logger.debug('Queue is empty')
                             self.run()
                         } else {
-                            console.log('Has job runing or queue empty')
+                            app.utils.logger.debug('Has job runing')
                         }
+                    }).catch(error => {
+                        app.utils.logger.error('Error in start server:',error=error)
                     })
                 }, 30000);
             }
         } catch (e) {
-            console.error(e)
+            app.utils.logger.error('Not start server:',error=e)
         }
     }
 

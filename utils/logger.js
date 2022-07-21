@@ -16,7 +16,6 @@ module.exports = function (app) {
     
     if (process.env.NODE_ENV !== 'prod') {
         logger.add(new winston.transports.Console({
-            
             format: winston.format.combine(
                 winston.format.colorize(),
                 winston.format.printf(({ level, message, timestamp, stack }) => {
@@ -26,9 +25,10 @@ module.exports = function (app) {
                     }
                     return `[ ${timestamp} ${level}]: ${message}`;
                 })
-            )
+            ),
+            level: 'debug' 
             
-        }));
+        },));
     }
     return logger
 }
