@@ -87,14 +87,16 @@ app.database.client.init(function () {
                         .into(app);
 
                     const analysisAtlas = app.jobs.analysisAtlas;
-
+                    const contato = app.database.contact
                     const httpServer = http.listen(app.config.port, function () {
                         console.log('LAPIG-JOBS Server @ [port %s] [pid %s]', app.config.port, process.pid.toString());
                         if(success){
                             app.utils.logger.info('Mailer is ready to send messages');
                         }
 
-                        analysisAtlas.start();
+                        //analysisAtlas.start();
+                        contato.init(() => {console.log('IHUUL!')});
+
                     });
 
                     [`exit`, `uncaughtException`].forEach((event) => {
@@ -109,7 +111,6 @@ app.database.client.init(function () {
                     })
                 }
             });
-
         });
     });
 })
