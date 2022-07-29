@@ -8,8 +8,10 @@ module.exports = function(app) {
     const config = app.config;
     Internal['pool-lapig'] = new Pool(config['pg_lapig'])
 
-    Internal['pool-general'] = new Pool(config['pg_general'])
+    Client.poolGeneral = new Pool(config['pg_general'])
+    Client.poolLapig = new Pool(config['pg_lapig'])
 
+    Internal['pool-general'] = new Pool(config['pg_general'])
     Internal.prepareQuery = function(sqlQuery, params) {
         Object.keys(params).forEach(function(name) {
             sqlQuery = sqlQuery.replace("${" + name + "}%", "'" + params[name].toUpperCase() + "%'")

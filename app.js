@@ -87,15 +87,17 @@ app.database.client.init(function () {
                         .into(app);
 
                     const analysisAtlas = app.jobs.analysisAtlas;
-                    const contato = app.database.contact
+                    const emailContact = app.jobs.emailContact;
+                    
                     const httpServer = http.listen(app.config.port, function () {
                         console.log('LAPIG-JOBS Server @ [port %s] [pid %s]', app.config.port, process.pid.toString());
                         if(success){
                             app.utils.logger.info('Mailer is ready to send messages');
                         }
 
-                        //analysisAtlas.start();
-                        contato.init(() => {console.log('IHUUL!')});
+                        console.log(app.database);
+                        emailContact.start();
+                        analysisAtlas.start();
 
                     });
 
