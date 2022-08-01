@@ -1,9 +1,12 @@
 const { error } = require("winston");
 const ejs = require("ejs");
 const path = require('path');
+const { env } = require("process");
 
 module.exports = function (app) {
-    let self = {}
+    let statusJobs = false;
+    
+    let self = {};
     let Jobs = {};
     const transporter = app.mailer.transporter;
     const config = app.config;
@@ -11,31 +14,46 @@ module.exports = function (app) {
     const jobsCollection = app.middleware.repository.collectionsJobs;
 
     const client = app.database.client;
+
+    Jobs.start = function () {
+
+        logger.debug('Init email sender');
+
+        if(!statusJobs) {
+            logger.debug('Começando envio de emails');
+
+            self.run();
+        }else {
+            logger.debug('Já estou trabalho nos emails.');
+        }
+
+        setInterval(() => {
+            if(!statusJobs) {
+                logger.debug('Começando envio de emails');
+
+                self.run();
+            }else {
+                logger.debug('Já estou trabalho nos emails.');
+            }
+        }, 60000);
+    }
     
-    self.start = function () {
-        app.utils.logger.debug('Start emails job');
+    self.run = function () {
+        statusJobs = true;
+
+        logger.debug('Start emails job');
         client.poolLapig.query("SELECT id, \"name\", email, subject, message, institution, status FROM public.contato_atlas where status = 'RECEIVED';", (err, resultContacts) => {
 
             if (err !== null) {
-                if(err != undefined){
-                    app.utils.logger.error(err)
+                statusJobs = false;
+                if(err !== undefined){
+                    logger.error(err);
                 }
-            } else if (config['pg_lapig']['debug']) {
-                app.utils.logger.debug('Executed query', error= { query, rows: resultContacts.rowCount })
             }
 
-            client.poolLapig.query("SELECT email FROM public.contato_encaminhamento where atlas_pastagem = true;", (err, emailsResult) => {
+            logger.debug(`rows: ${resultContacts.rowCount}`);
 
-                if (err !== null){
-                    if(err != undefined){
-                        app.utils.logger.error(err)
-                    }
-                } else if (config['pg_lapig']['debug']) {
-                    app.utils.logger.error('Executed query', error = { query, rows: emailsResult.rowCount })
-                }
-
-                self.process({contacts: resultContacts.rows, emails: emailsResult.rows});
-            });
+            self.process({contacts: resultContacts.rows});
         });
     }
 
@@ -55,36 +73,45 @@ module.exports = function (app) {
                     }
                     ejs.renderFile(path.resolve("./views/emails/response.ejs"), {email}, function (err, templeteHtml) {
                         if (err) {
+                            statusJobs = false;
                             app.util.logger.error('Render file', error= err);
                         } else {
                             logger.debug(`Email redenderizado com sucesso.`);
-                            data.emails.forEach(function (emailObj) {
-                                const mainOptions = {
-                                    from: title + ' <' + config.mailer.from + '>',
-                                    sender: config.mailer.sender,
-                                    replyTo: config.mailer.sender,
-                                    to: emailObj.email,
-                                    subject: contact.subject,
-                                    html: templeteHtml
-                                };
+                            const mainOptions = {
+                                from: title + ' <' + config.mailer.from + '>',
+                                sender: config.mailer.sender,
+                                replyTo: config.mailer.sender,
+                                to: config.mailer.emailAtlas,
+                                subject: contact.subject,
+                                html: templeteHtml
+                            };
 
-                                transporter.sendMail(mainOptions, function (err, info) {
-                                    if (err) {
-                                        app.util.logger.error('Error send contact', error= err);
-                                    } else {
-                                        logger.info(`Email enviado com sucesso. Email:${emailObj.email}`);
-                                        jobsCollection.jobs.updateOne(
-                                            {"_id": job._id},
-                                            {$set: {"sendedResponse": info}}
-                                        )
-                                    }
-                                });
-                            })
+                            transporter.sendMail(mainOptions, function (err, info) {
+
+                                if (err) {
+                                    statusJobs = false;
+                                    logger.error('Error send contact', error= err);
+                                } else {
+                                    logger.info(`Email enviado com sucesso. Email:${config.mailer.emailAtlas}`);
+                                    logger.debug(`contato_atlas id: ${contact.id}`);
+                                    client.poolLapig.query(
+                                        `UPDATE public.contato_atlas SET status='EMAIL_SENDED' WHERE id=${contact.id};`, 
+                                        (err, resultContacts) => {
+
+                                            if(err) {
+                                                logger.error('Não deu pra atualizar o banco de dados, mas o email foi enviado.', error= err);
+                                            }
+                                    });
+                                }
+                            });
                         }
                     });
+
+                    statusJobs = false;
                 });
             });
     }
 
-    return self;
+    return Jobs;
 };
+

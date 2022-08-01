@@ -49,7 +49,8 @@ module.exports = function (app) {
             "host": env.MAILER_HOST,
             "port": env.MAILER_PORT,
             "user": env.MAILER_USER,
-            "password": env.MAILER_PASSWORD
+            "password": env.MAILER_PASSWORD,
+            "emailAtlas": env.EMAIL_ATLAS
         },
         "ows_host": env.OWS_HOST,
         "ows_local": env.OWS_LOCAL,
