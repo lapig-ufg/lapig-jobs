@@ -96,7 +96,7 @@ app.database.client.init(function () {
                         }
 
                         emailContact.start();
-                        //analysisAtlas.start();
+                        analysisAtlas.start();
                     });
 
                     [`exit`, `uncaughtException`].forEach((event) => {

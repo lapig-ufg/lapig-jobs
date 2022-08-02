@@ -19,6 +19,9 @@ module.exports = function (app) {
             format: winston.format.combine(
                 winston.format.colorize(),
                 winston.format.printf(({ level, message, timestamp, stack }) => {
+                    if (typeof message === 'object') {
+                        message = JSON.stringify(message, null, 3);
+                    }
                     if (stack) {
                         // print log trace 
                         return `[${timestamp} ${level}]: ${message} \n ${stack}`;
