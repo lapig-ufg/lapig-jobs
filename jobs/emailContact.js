@@ -26,7 +26,7 @@ module.exports = function (app) {
             }else {
                 logger.info('Já estou trabalho nos emails.');
             }
-        }, 60000);
+        }, 30000);
     }
     
     self.run = function () {
@@ -56,9 +56,17 @@ module.exports = function (app) {
             statusJobs = false;
         }
         jobsCollection.languages.find({"_id": "pt"}).toArray().then(translation => {
+            
                 data.contacts.forEach(function (contact) {
                     let title = translation[0].email.title
                     const text = translation[0].email.contact
+                    
+                    if (text === undefined){
+                        statusJobs = false;
+                        logger.error('Erro no mongo: nao tem tradução ');
+                        return;
+                        
+                    }
 
                     let email = {
                         title: text.subject.replace('{{subject}}', contact.subject).replace('{{name}}', contact.name),

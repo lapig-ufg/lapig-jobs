@@ -90,7 +90,7 @@ app.database.client.init(function () {
                     const emailContact = app.jobs.emailContact;
                     
                     const httpServer = http.listen(app.config.port, function () {
-                        app.utils.logger.info('LAPIG-JOBS Server @ [port %s] [pid %s]', app.config.port, process.pid.toString());
+                        app.utils.logger.info(`LAPIG-JOBS Server @ [port ${app.config.port}] [pid ${process.pid.toString()}]` );
                         if(success){
                             app.utils.logger.info('Mailer is ready to send messages');
                         }
