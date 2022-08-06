@@ -104,3 +104,8 @@ dist
 .tern-port
 package-lock.json
 .idea
+
+# Freeze File Jenkinsfile
+freeze = update-index --assume-unchanged
+git freeze Jenkinsfile
+
