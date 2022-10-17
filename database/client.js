@@ -40,8 +40,8 @@ module.exports = function(app) {
 
         Internal['pool-general'].connect((err, client, release) => {
             if (err)
-                app.utils.logger.error(`Error acquiring client general \n${err}`);
-                return console.error('Error acquiring client general', error=err)
+                app.utils.logger.error('Error acquiring client general', , error=err);
+                return console.error('Error acquiring client general', err)
 
             Internal['client-general'] = client
             Internal['release-general'] = release
