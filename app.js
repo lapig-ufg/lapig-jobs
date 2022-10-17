@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+const { Console } = require('console');
 const express = require('express'),
     load = require('express-load'),
     util = require('util'),
@@ -52,6 +53,7 @@ app.database.client.init(function () {
         app.database.client.init_general(() => {
             app.mailer.transporter.verify((error, success) => {
                 if (error) {
+                    app.utils.logger.error('Timeout: ' + err)
                     console.error(error);
                 } else {
 
@@ -63,7 +65,8 @@ app.database.client.init(function () {
                         'callback': function (err, options) {
                             let response = options.res;
                             if (err) {
-                                util.log('Timeout: ' + err);
+                                app.utils.logger.error('Timeout: ' + err)
+                                console.log('Timeout: ' + err);
                             }
                             response.end();
                         }
@@ -78,6 +81,7 @@ app.database.client.init(function () {
 
                     app.use(function (error, request, response, next) {
                         console.log('ServerError: ', error.stack);
+                        app.utils.logger.error('ServerError: ', error.stack)
                         next();
                     });
 
@@ -90,6 +94,7 @@ app.database.client.init(function () {
                     const emailContact = app.jobs.emailContact;
                     
                     const httpServer = http.listen(app.config.port, function () {
+                        app.utils.logger.error('Start Lapig Jobs')
                         app.utils.logger.info(`LAPIG-JOBS Server @ [port ${app.config.port}] [pid ${process.pid.toString()}]` );
                         if(success){
                             app.utils.logger.info('Mailer is ready to send messages');
