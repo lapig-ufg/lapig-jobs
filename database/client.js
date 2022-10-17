@@ -25,8 +25,8 @@ module.exports = function(app) {
     Client.init = function(callback) {
         Internal['pool-lapig'].connect((err, client, release) => {
             if (err)
-                app.utils.logger.error('Error acquiring client', error=err);
-                return console.error('Error acquiring client', err)
+                app.utils.logger.error('Error acquiring client pool-lapig', error=err);
+                return console.error('Error acquiring client pool-lapig', err)
 
             Internal['client-lapig'] = client
             Internal['release-lapig'] = release
@@ -40,8 +40,8 @@ module.exports = function(app) {
 
         Internal['pool-general'].connect((err, client, release) => {
             if (err)
-                app.utils.logger.error('Error acquiring client general', error=err);
-                return console.error('Error acquiring client general', err)
+                app.utils.logger.error('Error acquiring client general pool-general', error=err);
+                return console.error('Error acquiring client general pool-general', err)
 
             Internal['client-general'] = client
             Internal['release-general'] = release
