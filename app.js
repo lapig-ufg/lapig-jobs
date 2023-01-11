@@ -53,7 +53,7 @@ app.database.client.init(function () {
         app.database.client.init_general(() => {
             app.mailer.transporter.verify((error, success) => {
                 if (error) {
-                    app.utils.logger.error('Timeout: ' + err)
+                    app.utils.logger.error('Timeout: ' + error)
                     console.error(error);
                 } else {
 
@@ -66,7 +66,7 @@ app.database.client.init(function () {
                             let response = options.res;
                             if (err) {
                                 app.utils.logger.error('Timeout: ' + err)
-                                console.log('Timeout: ' + err);
+                                console.log('Timeout: ' + err.stack);
                             }
                             response.end();
                         }
