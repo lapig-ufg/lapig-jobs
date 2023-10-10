@@ -1,5 +1,4 @@
-name: Build and Deploy in Production Server atlas
-
+name: Build and Deploy in Production Server app_lapig_jobs
 on:
   push:
     branches:

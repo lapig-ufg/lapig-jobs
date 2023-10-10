@@ -1,4 +1,4 @@
-name: Build and Deploy in Homol Server atlas
+name: Build and Deploy in Homol Server app_lapig_jobs
 
 on:
   push:
